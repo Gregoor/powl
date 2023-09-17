@@ -1,7 +1,7 @@
 "use client";
 import { useMutation, useQuery } from "convex/react";
 import Link from "next/link";
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 
 import { api } from "~/convex/_generated/api";
 import { Content } from "~/ui";
@@ -29,6 +29,14 @@ export default function PollPage({
   });
   const vote = useMutation(api.polls.vote);
 
+  const [checked, setChecked] = useState<number[]>([]);
+
+  useEffect(() => {
+    if (userVote) {
+      setChecked(userVote.optionIndexes);
+    }
+  }, [userVote]);
+
   if (!poll) {
     return null;
   }
@@ -47,20 +55,42 @@ export default function PollPage({
               className="border rounded p-2 flex flex-col gap-2 cursor-pointer"
             >
               <div className="flex flex-row gap-2">
-                <input
-                  type={poll.isMulti ? "checkbox" : "radio"}
-                  name="option"
-                  value={i}
-                  className="p-2 cursor-pointer accent-orange-500"
-                  defaultChecked={userVote?.optionIndexes.includes(i)}
-                  onChange={(event) => {
-                    vote({
-                      pollId: id,
-                      userId: getUserId(),
-                      optionIndexes: event.target.checked ? [i] : [],
-                    });
-                  }}
-                />
+                {poll.isMulti ? (
+                  <input
+                    type="checkbox"
+                    name="option"
+                    value={i}
+                    className="p-2 cursor-pointer accent-orange-500"
+                    checked={checked.includes(i)}
+                    onChange={(event) => {
+                      const newChecked = event.target.checked
+                        ? checked.concat(i)
+                        : checked.filter((c) => c !== i);
+                      console.log(newChecked);
+                      setChecked(newChecked);
+                      vote({
+                        pollId: id,
+                        userId: getUserId(),
+                        optionIndexes: newChecked,
+                      });
+                    }}
+                  />
+                ) : (
+                  <input
+                    type="radio"
+                    name="option"
+                    value={i}
+                    className="p-2 cursor-pointer accent-orange-500"
+                    defaultChecked={userVote?.optionIndexes.includes(i)}
+                    onChange={(event) => {
+                      vote({
+                        pollId: id,
+                        userId: getUserId(),
+                        optionIndexes: event.target.checked ? [i] : [],
+                      });
+                    }}
+                  />
+                )}
                 <div className="w-full flex flex-row gap-4 justify-between">
                   <div>{text}</div>
                   <div className="font-bold">{votes}</div>

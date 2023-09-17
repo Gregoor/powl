@@ -6,6 +6,7 @@ import { useState } from "react";
 
 import { api } from "~/convex/_generated/api";
 import { Button, Content } from "~/ui";
+import { Pow } from "./Pow";
 
 const Input = (props: React.ComponentProps<"input">) => (
   <input type="text" className="border rounded p-2 dark:bg-black" {...props} />
@@ -46,6 +47,9 @@ export default function Home() {
             Create polls with a <span className="text-orange-500">pow</span>
           </h2>
         </div>
+
+        {isSaving && <Pow />}
+
         <Input
           placeholder="Question..."
           value={question}
