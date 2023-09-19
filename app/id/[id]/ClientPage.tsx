@@ -25,6 +25,28 @@ export function ClientOnly({ children }: { children: React.ReactNode }) {
   return isClient ? children : null;
 }
 
+function postResizeMessage(el: HTMLElement) {
+  window.parent?.postMessage(
+    {
+      type: "resize",
+      width: el.offsetWidth,
+      height: el.offsetHeight,
+    },
+    "*"
+  );
+}
+
+function postResizeChanges(element = document.body) {
+  postResizeMessage(element);
+  const ro = new ResizeObserver(() => {
+    postResizeMessage(element);
+  });
+  ro.observe(element);
+  return () => {
+    ro.disconnect();
+  };
+}
+
 export function ClientPollPage({
   pollId,
   isFramed,
@@ -49,13 +71,16 @@ export function ClientPollPage({
   }
 
   return (
-    <Content>
+    <Content isFramed={isFramed}>
       {!isFramed && (
         <h1 className="mb-8 text-2xl text-orange-500">
           <Link href="/">Powl</Link>
         </h1>
       )}
-      <div className="flex flex-col gap-4">
+      <div
+        ref={(el) => (isFramed && el ? postResizeChanges(el) : undefined)}
+        className="flex flex-col gap-4"
+      >
         <h2 className="text-xl">{poll.question}</h2>
         <div className="flex flex-col gap-2">
           {poll.options.map(({ text, votes }, i) => (
