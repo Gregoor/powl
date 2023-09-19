@@ -1,5 +1,3 @@
-import fs from "fs";
-
 import { headers } from "next/headers";
 
 import { ClientOnly, ClientPollPage } from "./ClientPage";

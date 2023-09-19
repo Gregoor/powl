@@ -28,7 +28,7 @@ export function ClientOnly({ children }: { children: React.ReactNode }) {
 function postResizeMessage(el: HTMLElement) {
   window.parent?.postMessage(
     {
-      type: "resize",
+      type: "oframe:resize",
       width: el.offsetWidth,
       height: el.offsetHeight,
     },
