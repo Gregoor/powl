@@ -2,12 +2,14 @@
 import { useMutation, useQuery } from "convex/react";
 import Link from "next/link";
 import { useEffect, useState } from "react";
+import { postResizeChanges } from "@oembed/bus";
 
 import { api } from "~/convex/_generated/api";
 import { Content } from "~/ui";
 
 const rnd = () => crypto.getRandomValues(new Uint32Array(1))[0].toString(32);
 const getUserId = () => {
+  // TODO private browsing no allow localstorage access in iframe or sth like that
   let userId = localStorage.getItem("userId");
   if (userId) {
     return userId;
@@ -23,28 +25,6 @@ export function ClientOnly({ children }: { children: React.ReactNode }) {
     setIsClient(true);
   }, []);
   return isClient ? children : null;
-}
-
-function postResizeMessage(el: HTMLElement) {
-  window.parent?.postMessage(
-    {
-      type: "oframe:resize",
-      width: el.offsetWidth,
-      height: el.offsetHeight,
-    },
-    "*"
-  );
-}
-
-function postResizeChanges(element = document.body) {
-  postResizeMessage(element);
-  const ro = new ResizeObserver(() => {
-    postResizeMessage(element);
-  });
-  ro.observe(element);
-  return () => {
-    ro.disconnect();
-  };
 }
 
 export function ClientPollPage({

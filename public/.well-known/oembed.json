@@ -1,4 +1,4 @@
 {
-  "provider_name": "Powl",
-  "endpoints": [{ "schemes": ["/id/*"] }]
+  "name": "Powl",
+  "sources": [{ "match": ["/id/*"] }]
 }
