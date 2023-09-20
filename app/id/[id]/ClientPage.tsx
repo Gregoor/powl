@@ -29,11 +29,13 @@ export function ClientOnly({ children }: { children: React.ReactNode }) {
 
 export function ClientPollPage({
   pollId,
-  isFramed,
+  isFramed: isFramedProp,
 }: {
   pollId: string;
   isFramed: boolean;
 }) {
+  // In dev, during hot reloads, the frame header changes. This persists it.
+  const [isFramed] = useState(isFramedProp);
   const poll = useQuery(api.polls.get, { id: pollId });
   const userVote = useQuery(api.polls.getVote, { pollId, userId: getUserId() });
   const vote = useMutation(api.polls.vote);
@@ -126,6 +128,15 @@ export function ClientPollPage({
             </label>
           ))}
         </div>
+        {isFramed && (
+          <a
+            className="flex self-end text-xs underline text-gray-500"
+            href="/"
+            target="_blank"
+          >
+            Create your own poll
+          </a>
+        )}
       </div>
     </Content>
   );
