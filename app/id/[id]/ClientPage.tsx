@@ -2,7 +2,7 @@
 import { useMutation, useQuery } from "convex/react";
 import Link from "next/link";
 import { useEffect, useState } from "react";
-import { postResizeChanges } from "@oembed/bus";
+import { postResizeChanges } from "@emweb/bus";
 
 import { api } from "~/convex/_generated/api";
 import { Content } from "~/ui";
@@ -134,7 +134,7 @@ export function ClientPollPage({
             href="/"
             target="_blank"
           >
-            Create your own poll
+            Create your own poll with Powl
           </a>
         )}
       </div>

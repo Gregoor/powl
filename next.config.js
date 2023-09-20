@@ -3,7 +3,7 @@ const nextConfig = {
   async headers() {
     return [
       {
-        source: "/.well-known/oembed.json",
+        source: "/.well-known/emweb.json",
         headers: [{ key: "Access-Control-Allow-Origin", value: "*" }],
       },
     ];
