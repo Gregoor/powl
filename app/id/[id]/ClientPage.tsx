@@ -61,7 +61,7 @@ export function ClientPollPage({
       )}
       <div
         ref={(el) => (isFramed && el ? postResizeChanges(el) : undefined)}
-        className="flex flex-col gap-4"
+        className={"flex flex-col gap-4 " + (isFramed ? "p-2" : "")}
       >
         <h2 className="text-xl">{poll.question}</h2>
         <div className="flex flex-col gap-2">
