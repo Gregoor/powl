@@ -52,10 +52,10 @@ export function ClientPollPage({
 
   useEffect(() => {
     const el = ref.current;
-    if (isFramed && el) {
+    if (isFramed && el && poll) {
       postResizeChanges(el);
     }
-  }, [isFramed]);
+  }, [isFramed, poll]);
 
   if (!poll) {
     return null;
