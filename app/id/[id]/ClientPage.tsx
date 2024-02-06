@@ -1,7 +1,7 @@
 "use client";
 import { useMutation, useQuery } from "convex/react";
 import Link from "next/link";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { postResizeChanges } from "@emweb/bus";
 
 import { api } from "~/convex/_generated/api";
@@ -42,11 +42,20 @@ export function ClientPollPage({
 
   const [checked, setChecked] = useState<number[]>([]);
 
+  const ref = useRef<HTMLDivElement>(null);
+
   useEffect(() => {
     if (userVote) {
       setChecked(userVote.optionIndexes);
     }
   }, [userVote]);
+
+  useEffect(() => {
+    const el = ref.current;
+    if (isFramed && el) {
+      postResizeChanges(el);
+    }
+  }, [isFramed]);
 
   if (!poll) {
     return null;
@@ -60,7 +69,7 @@ export function ClientPollPage({
         </h1>
       )}
       <div
-        ref={(el) => (isFramed && el ? postResizeChanges(el) : undefined)}
+        ref={ref}
         className={"flex flex-col gap-4 " + (isFramed ? "p-2" : "")}
       >
         <h2 className="text-xl">{poll.question}</h2>
@@ -82,7 +91,6 @@ export function ClientPollPage({
                       const newChecked = event.target.checked
                         ? checked.concat(i)
                         : checked.filter((c) => c !== i);
-                      console.log(newChecked);
                       setChecked(newChecked);
                       vote({
                         pollId,
