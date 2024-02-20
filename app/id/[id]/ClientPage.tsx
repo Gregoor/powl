@@ -40,15 +40,7 @@ export function ClientPollPage({
   const userVote = useQuery(api.polls.getVote, { pollId, userId: getUserId() });
   const vote = useMutation(api.polls.vote);
 
-  const [checked, setChecked] = useState<number[]>([]);
-
   const ref = useRef<HTMLDivElement>(null);
-
-  useEffect(() => {
-    if (userVote) {
-      setChecked(userVote.optionIndexes);
-    }
-  }, [userVote]);
 
   useEffect(() => {
     const el = ref.current;
@@ -61,6 +53,7 @@ export function ClientPollPage({
     return null;
   }
 
+  const checked = userVote?.optionIndexes ?? [];
   return (
     <Content isFramed={isFramed}>
       {!isFramed && (
@@ -91,7 +84,7 @@ export function ClientPollPage({
                       const newChecked = event.target.checked
                         ? checked.concat(i)
                         : checked.filter((c) => c !== i);
-                      setChecked(newChecked);
+
                       vote({
                         pollId,
                         userId: getUserId(),
