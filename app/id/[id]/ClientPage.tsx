@@ -53,6 +53,8 @@ export function ClientPollPage({
     return null;
   }
 
+  console.log(userVote);
+
   const checked = userVote?.optionIndexes ?? [];
   return (
     <Content isFramed={isFramed}>
@@ -98,7 +100,7 @@ export function ClientPollPage({
                     name="option"
                     value={i}
                     className="p-2 cursor-pointer accent-orange-500"
-                    defaultChecked={userVote?.optionIndexes.includes(i)}
+                    checked={userVote?.optionIndexes.includes(i)}
                     onChange={(event) => {
                       vote({
                         pollId,
