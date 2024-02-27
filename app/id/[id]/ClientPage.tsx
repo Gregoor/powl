@@ -45,7 +45,7 @@ export function ClientPollPage({
   useEffect(() => {
     const el = ref.current;
     if (isFramed && el && poll) {
-      return postResizeChanges(el);
+      postResizeChanges(el)();
     }
   }, [isFramed, poll]);
 
