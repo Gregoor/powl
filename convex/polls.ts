@@ -12,7 +12,14 @@ export const create = mutation({
   handler: ({ db }, args) =>
     db.insert("polls", {
       ...args,
-      options: args.options.map((text) => ({ text, votes: 0 })),
+      options: args.options.map(
+        (text) =>
+          ({
+            text,
+            value: { type: "text", value: text },
+            votes: 0,
+          } as const)
+      ),
     }),
 });
 

@@ -4,7 +4,18 @@ import { v } from "convex/values";
 export default defineSchema({
   polls: defineTable({
     isMulti: v.boolean(),
-    options: v.array(v.object({ text: v.string(), votes: v.number() })),
+    options: v.array(
+      v.object({
+        text: v.string(),
+        value: v.optional(
+          v.object({
+            type: v.union(v.literal("text"), v.literal("datetime")),
+            value: v.string(),
+          })
+        ),
+        votes: v.number(),
+      })
+    ),
     question: v.string(),
   }),
 
