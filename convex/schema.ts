@@ -13,6 +13,7 @@ export default defineSchema({
     isMulti: v.boolean(),
     options: v.array(
       v.object({
+        text: v.optional(v.string()),
         value: optionValue,
         votes: v.number(),
       }),
