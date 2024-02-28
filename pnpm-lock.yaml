@@ -5,6 +5,9 @@ settings:
   excludeLinksFromLockfile: false
 
 dependencies:
+  '@dnd-kit/core':
+    specifier: ^6.1.0
+    version: 6.1.0(react-dom@18.2.0)(react@18.2.0)
   '@emweb/bus':
     specifier: ^0.1.1
     version: 0.1.1
@@ -20,9 +23,15 @@ dependencies:
   autoprefixer:
     specifier: 10.4.17
     version: 10.4.17(postcss@8.4.35)
+  classnames:
+    specifier: ^2.5.1
+    version: 2.5.1
   convex:
     specifier: ^1.9.1
     version: 1.9.1(react-dom@18.2.0)(react@18.2.0)
+  convex-helpers:
+    specifier: ^0.1.23
+    version: 0.1.23(convex@1.9.1)(react@18.2.0)(zod@3.22.4)
   eslint:
     specifier: 8.56.0
     version: 8.56.0
@@ -41,6 +50,9 @@ dependencies:
   react-dom:
     specifier: 18.2.0
     version: 18.2.0(react@18.2.0)
+  remeda:
+    specifier: ^1.44.1
+    version: 1.44.1
   tailwindcss:
     specifier: 3.4.1
     version: 3.4.1
@@ -65,6 +77,37 @@ packages:
     engines: {node: '>=6.9.0'}
     dependencies:
       regenerator-runtime: 0.14.1
+    dev: false
+
+  /@dnd-kit/accessibility@3.1.0(react@18.2.0):
+    resolution: {integrity: sha512-ea7IkhKvlJUv9iSHJOnxinBcoOI3ppGnnL+VDJ75O45Nss6HtZd8IdN8touXPDtASfeI2T2LImb8VOZcL47wjQ==}
+    peerDependencies:
+      react: '>=16.8.0'
+    dependencies:
+      react: 18.2.0
+      tslib: 2.6.2
+    dev: false
+
+  /@dnd-kit/core@6.1.0(react-dom@18.2.0)(react@18.2.0):
+    resolution: {integrity: sha512-J3cQBClB4TVxwGo3KEjssGEXNJqGVWx17aRTZ1ob0FliR5IjYgTxl5YJbKTzA6IzrtelotH19v6y7uoIRUZPSg==}
+    peerDependencies:
+      react: '>=16.8.0'
+      react-dom: '>=16.8.0'
+    dependencies:
+      '@dnd-kit/accessibility': 3.1.0(react@18.2.0)
+      '@dnd-kit/utilities': 3.2.2(react@18.2.0)
+      react: 18.2.0
+      react-dom: 18.2.0(react@18.2.0)
+      tslib: 2.6.2
+    dev: false
+
+  /@dnd-kit/utilities@3.2.2(react@18.2.0):
+    resolution: {integrity: sha512-+MKAJEOfaBe5SmV6t34p80MMKhjvUz0vRrvVJbPT0WElzaOJ/1xs+D+KDv+tD/NE5ujfrChEcshd4fLn0wpiqg==}
+    peerDependencies:
+      react: '>=16.8.0'
+    dependencies:
+      react: 18.2.0
+      tslib: 2.6.2
     dev: false
 
   /@emweb/bus@0.1.1:
@@ -901,6 +944,10 @@ packages:
       fsevents: 2.3.3
     dev: false
 
+  /classnames@2.5.1:
+    resolution: {integrity: sha512-saHYOzhIQs6wy2sVxTM6bUDsQO4F50V9RQ22qBpEdCW+I+/Wmke2HOl6lS6dTpdxVhb88/I6+Hs+438c3lfUow==}
+    dev: false
+
   /client-only@0.0.1:
     resolution: {integrity: sha512-IV3Ou0jSMzZrd3pZ48nLkT9DA7Ag1pnPzaiQhpW7c3RbcqqzvzzVu+L8gfqMp/8IM2MQtSiqaCxrrcfu8I8rMA==}
     dev: false
@@ -923,6 +970,26 @@ packages:
 
   /concat-map@0.0.1:
     resolution: {integrity: sha512-/Srv4dswyQNBfohGpz9o6Yb3Gz3SrUDqBH5rTuhGR7ahtlbYKnVxw2bCFMRljaA7EXHaXZ8wsHdodFvbkhKmqg==}
+    dev: false
+
+  /convex-helpers@0.1.23(convex@1.9.1)(react@18.2.0)(zod@3.22.4):
+    resolution: {integrity: sha512-ofonHDJ6K5btN6tq27mwpb8DmLXN+GC4I/tgWubUAQKg28JXqD99wo08g032qX1yUSxOUesLjAQU/HEgqsAbjA==}
+    peerDependencies:
+      convex: ^1.9.1
+      hono: ^4.0.5
+      react: ^17.0.2 || ^18.0.0
+      zod: ^3.22.4
+    peerDependenciesMeta:
+      hono:
+        optional: true
+      react:
+        optional: true
+      zod:
+        optional: true
+    dependencies:
+      convex: 1.9.1(react-dom@18.2.0)(react@18.2.0)
+      react: 18.2.0
+      zod: 3.22.4
     dev: false
 
   /convex@1.9.1(react-dom@18.2.0)(react@18.2.0):
@@ -2541,6 +2608,10 @@ packages:
       call-bind: 1.0.5
       define-properties: 1.2.1
       set-function-name: 2.0.1
+    dev: false
+
+  /remeda@1.44.1:
+    resolution: {integrity: sha512-IzUxPZbhLIq7duT2xEjLD5s+lA+J5Qq12dDmgmW8PsQAKsCU5rdydTZEYiiklgg53Lo363/q99dOxq4hnsaJ7A==}
     dev: false
 
   /resolve-from@4.0.0:

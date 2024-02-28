@@ -53,8 +53,6 @@ export function ClientPollPage({
     return null;
   }
 
-  console.log(userVote);
-
   const checked = userVote?.optionIndexes ?? [];
   return (
     <Content isFramed={isFramed}>
