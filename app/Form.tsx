@@ -1,4 +1,5 @@
 "use client";
+
 import {
   DndContext,
   PointerSensor,
@@ -9,34 +10,42 @@ import {
 } from "@dnd-kit/core";
 import cx from "classnames";
 import { useMutation } from "convex/react";
+import { CalendarIcon, WholeWordIcon } from "lucide-react";
 import { useRouter } from "next/navigation";
-import React, { useEffect, useId, useState } from "react";
+import React, { useEffect, useId, useMemo, useState } from "react";
+import { equals, sortBy } from "remeda";
 
 import { api } from "~/convex/_generated/api";
+import { OptionValue } from "~/convex/schema";
 import { Button } from "~/ui";
+
 import { Pow } from "./Pow";
 
 // eslint-disable-next-line react/display-name
-const Input = React.forwardRef<HTMLInputElement, React.ComponentProps<"input">>(
-  ({ className, ...props }, ref) => (
-    <input
-      ref={ref}
-      type="text"
-      className={cx("border rounded p-2 dark:bg-black", className)}
-      {...props}
-    />
-  )
+const Input = ({ className, ...props }: React.ComponentProps<"input">) => (
+  <input
+    type="text"
+    className={cx("border rounded p-2 leading-none dark:bg-black", className)}
+    {...props}
+  />
 );
 
-const DraggableInput = ({
+const OptionInput = ({
   index,
-  ...props
-}: React.ComponentProps<"input"> & { index: number }) => {
+  option,
+  onChange,
+  required,
+}: {
+  index: number;
+  option: OptionValue;
+  onChange: (option: OptionValue) => void;
+  required?: boolean;
+}) => {
   const id = useId();
   const { attributes, listeners, setNodeRef, transform } = useDraggable({
     id,
     data: { index },
-    disabled: !props.value,
+    disabled: !option.value,
   });
 
   const dragStyle = transform
@@ -48,13 +57,43 @@ const DraggableInput = ({
       }
     : undefined;
   return (
-    <Input
+    <div
       ref={setNodeRef as any}
-      {...props}
+      className="flex flex-row"
       {...listeners}
       {...attributes}
       style={dragStyle}
-    />
+    >
+      <button
+        type="button"
+        className="border border-r-0 rounded-l p-2 dark:bg-black"
+        onClick={() => {
+          onChange(
+            option.type == "text"
+              ? {
+                  type: "datetime",
+                  value: new Date().toISOString().slice(0, -8),
+                }
+              : { type: "text", value: "" },
+          );
+        }}
+      >
+        {React.createElement(
+          option.type == "text" ? WholeWordIcon : CalendarIcon,
+          { size: 18, className: "stroke-gray-600" },
+        )}
+      </button>
+      <Input
+        type={option.type === "datetime" ? "datetime-local" : "text"}
+        placeholder={`Option ${index + 1}...`}
+        className="rounded-l-none w-full cursor-text"
+        value={option.value}
+        onChange={(event) =>
+          onChange({ type: option.type, value: event.target.value })
+        }
+        required={required}
+      />
+    </div>
   );
 };
 
@@ -74,7 +113,7 @@ function Droppable({ index, disabled }: { index: number; disabled?: boolean }) {
         isOver &&
           activeIndex !== index &&
           activeIndex + 1 !== index &&
-          "bg-orange-500"
+          "bg-orange-500",
       )}
     />
   );
@@ -82,8 +121,24 @@ function Droppable({ index, disabled }: { index: number; disabled?: boolean }) {
 
 export function Form() {
   const [question, setQuestion] = useState("");
-  const [options, setOptions] = useState<string[]>(["", ""]);
   const [isMulti, setIsMulti] = useState(false);
+
+  const [options, setOptions] = useState<OptionValue[]>([
+    { type: "text", value: "" },
+    { type: "text", value: "" },
+  ]);
+  const sortedOptions = useMemo(
+    () =>
+      sortBy(
+        options,
+        (o) => o.type != "datetime",
+        (o) =>
+          o.type == "datetime"
+            ? new Date(o.value).getTime()
+            : options.indexOf(o),
+      ),
+    [options],
+  );
 
   const [isSaving, setIsSaving] = useState(false);
   const createPoll = useMutation(api.polls.create);
@@ -91,7 +146,7 @@ export function Form() {
   const router = useRouter();
 
   const sensors = useSensors(
-    useSensor(PointerSensor, { activationConstraint: { distance: 4 } })
+    useSensor(PointerSensor, { activationConstraint: { distance: 4 } }),
   );
 
   const [isClient, setIsClient] = useState(false);
@@ -111,7 +166,7 @@ export function Form() {
         setIsSaving(true);
         createPoll({
           question,
-          options: options.filter(Boolean),
+          options: options.filter((o) => o.value.trim()),
           isMulti,
         }).then((id) => {
           router.push(`/id/${id}`);
@@ -127,7 +182,23 @@ export function Form() {
           onChange={(event) => setQuestion(event.target.value)}
           required
         />
-        <div className="mt-2 text-sm">Tip: You can drag to sort options</div>
+        <div className="mt-2 text-sm">
+          Tip: You can drag options to re-order them
+          {!equals(options, sortedOptions) && (
+            <>
+              {" "}
+              (
+              <button
+                type="button"
+                className="underline"
+                onClick={() => setOptions(sortedOptions)}
+              >
+                click here to sort by time
+              </button>
+              )
+            </>
+          )}
+        </div>
         <DndContext
           sensors={sensors}
           onDragEnd={(event) => {
@@ -141,32 +212,34 @@ export function Form() {
                 .toSpliced(
                   to > active.index ? to - 1 : to,
                   0,
-                  options[active.index]
-                )
+                  options[active.index],
+                ),
             );
           }}
         >
           <Droppable index={0} />
-          {options.map((value, i) => [
-            <DraggableInput
+          {options.map((option, i) => [
+            <OptionInput
               key={i + "input"}
               index={i}
-              className="cursor-text"
-              placeholder={`Option ${i + 1}...`}
-              value={value}
-              onChange={(event) => {
+              option={option}
+              onChange={(option) => {
                 setOptions((options) => {
                   options = options.slice();
-                  options.splice(i, 1, event.target.value);
+                  options.splice(i, 1, option);
                   if (i === options.length - 1) {
-                    options.push("");
+                    options.push({ type: "text", value: "" });
                   }
                   return options;
                 });
               }}
               required={i < 2 && options.filter(Boolean).length < 2}
             />,
-            <Droppable key={i + "droppable"} index={i + 1} disabled={!value} />,
+            <Droppable
+              key={i + "droppable"}
+              index={i + 1}
+              disabled={!option}
+            />,
           ])}
         </DndContext>
       </div>

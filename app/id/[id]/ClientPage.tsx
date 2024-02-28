@@ -1,8 +1,9 @@
 "use client";
+
+import { postResizeChanges } from "@emweb/bus";
 import { useMutation, useQuery } from "convex/react";
 import Link from "next/link";
 import { useEffect, useRef, useState } from "react";
-import { postResizeChanges } from "@emweb/bus";
 
 import { api } from "~/convex/_generated/api";
 import { Content } from "~/ui";
@@ -38,7 +39,22 @@ export function ClientPollPage({
   const [isFramed] = useState(isFramedProp);
   const poll = useQuery(api.polls.get, { id: pollId });
   const userVote = useQuery(api.polls.getVote, { pollId, userId: getUserId() });
-  const vote = useMutation(api.polls.vote);
+  const vote = useMutation(api.polls.vote).withOptimisticUpdate(
+    (store, { pollId, optionIndexes }) => {
+      const poll = store.getQuery(api.polls.get, { id: pollId });
+      if (!poll) return;
+      store.setQuery(
+        api.polls.get,
+        { id: pollId },
+        {
+          ...poll,
+          options: poll.options.map((o, i) =>
+            optionIndexes.includes(i) ? { ...o, votes: o.votes + 1 } : o,
+          ),
+        },
+      );
+    },
+  );
 
   const ref = useRef<HTMLDivElement>(null);
 
@@ -67,7 +83,7 @@ export function ClientPollPage({
       >
         <h2 className="text-xl">{poll.question}</h2>
         <div className="flex flex-col gap-2">
-          {poll.options.map(({ text, votes }, i) => (
+          {poll.options.map(({ value, votes }, i) => (
             <label
               key={i}
               className="border rounded p-2 flex flex-col gap-2 cursor-pointer"
@@ -98,7 +114,7 @@ export function ClientPollPage({
                     name="option"
                     value={i}
                     className="p-2 cursor-pointer accent-orange-500"
-                    checked={userVote?.optionIndexes.includes(i)}
+                    checked={userVote?.optionIndexes.includes(i) ?? false}
                     onChange={(event) => {
                       vote({
                         pollId,
@@ -109,7 +125,14 @@ export function ClientPollPage({
                   />
                 )}
                 <div className="w-full flex flex-row gap-4 justify-between">
-                  <div>{text}</div>
+                  <div>
+                    {value.type == "text"
+                      ? value.value
+                      : new Date(value.value).toLocaleString(undefined, {
+                          dateStyle: "full",
+                          timeStyle: "short",
+                        })}
+                  </div>
                   <div className="font-bold">{votes}</div>
                 </div>
               </div>
@@ -122,7 +145,7 @@ export function ClientPollPage({
                       100 *
                       (votes / Math.max(...poll.options.map((o) => o.votes), 1))
                     }%`,
-                    transition: "width 200ms linear",
+                    transition: "width 200ms ease-in-out",
                   }}
                 />
               </div>

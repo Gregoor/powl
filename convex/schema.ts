@@ -1,22 +1,22 @@
 import { defineSchema, defineTable } from "convex/server";
-import { v } from "convex/values";
+import { Infer, v } from "convex/values";
+
+export const optionValue = v.object({
+  type: v.union(v.literal("text"), v.literal("datetime")),
+  value: v.string(),
+});
+export type OptionValue = Infer<typeof optionValue>;
 
 export default defineSchema({
   polls: defineTable({
+    question: v.string(),
     isMulti: v.boolean(),
     options: v.array(
       v.object({
-        text: v.string(),
-        value: v.optional(
-          v.object({
-            type: v.union(v.literal("text"), v.literal("datetime")),
-            value: v.string(),
-          })
-        ),
+        value: optionValue,
         votes: v.number(),
-      })
+      }),
     ),
-    question: v.string(),
   }),
 
   votes: defineTable({

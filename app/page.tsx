@@ -1,6 +1,7 @@
 import Link from "next/link";
 
 import { Content } from "~/ui";
+
 import { Form } from "./Form";
 
 export default function Home() {

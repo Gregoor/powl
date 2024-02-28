@@ -2,24 +2,18 @@ import { v } from "convex/values";
 
 import { Id } from "./_generated/dataModel";
 import { mutation, query } from "./_generated/server";
+import { optionValue } from "./schema";
 
 export const create = mutation({
   args: {
     question: v.string(),
-    options: v.array(v.string()),
     isMulti: v.boolean(),
+    options: v.array(optionValue),
   },
   handler: ({ db }, args) =>
     db.insert("polls", {
       ...args,
-      options: args.options.map(
-        (text) =>
-          ({
-            text,
-            value: { type: "text", value: text },
-            votes: 0,
-          } as const)
-      ),
+      options: args.options.map((value) => ({ value, votes: 0 })),
     }),
 });
 
@@ -44,7 +38,7 @@ export const vote = mutation({
     const prevVote = await db
       .query("votes")
       .withIndex("by_poll_user", (q) =>
-        q.eq("pollId", pollId).eq("userId", userId)
+        q.eq("pollId", pollId).eq("userId", userId),
       )
       .unique();
 
@@ -54,8 +48,8 @@ export const vote = mutation({
       : db.insert("votes", voteData));
 
     await db.patch(pollId, {
-      options: poll.options.map(({ text, votes }, i) => ({
-        text,
+      options: poll.options.map(({ value, votes }, i) => ({
+        value,
         votes:
           votes +
           (prevVote?.optionIndexes.includes(i) ? -1 : 0) +
@@ -71,7 +65,7 @@ export const getVote = query({
     db
       .query("votes")
       .withIndex("by_poll_user", (q) =>
-        q.eq("pollId", pollId as Id<"polls">).eq("userId", userId)
+        q.eq("pollId", pollId as Id<"polls">).eq("userId", userId),
       )
       .unique(),
 });
